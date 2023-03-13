@@ -435,11 +435,11 @@ int sprawdzczypelna(int tablica[]){
   }
   return 1;}
 void turaGracza1(char gracz[],int punktygracza,int tablicawynikow[],int kosci[]){
-  system("clear");
+  printf("\e[1;1H\e[2J");
   int i=0;
   wyswietlanieMozliwosci(tablicawynikow);
   sleep(2);
-  system("clear");
+  printf("\e[1;1H\e[2J");
   for(i=0;i<5;i++){
     kosci[i]=rzutkoscia();
     wyswietlanie_kosci(kosci[i]);
@@ -447,7 +447,7 @@ void turaGracza1(char gracz[],int punktygracza,int tablicawynikow[],int kosci[])
   selectionsort(kosci);
   ponownelosowanie(kosci);
   selectionsort(kosci);
-  system("clear");
+  printf("\e[1;1H\e[2J");
   for(i=0;i<5;i++){
   wyswietlanie_kosci(kosci[i]);}
   ponownelosowanie(kosci);
@@ -457,10 +457,10 @@ void turaGracza1(char gracz[],int punktygracza,int tablicawynikow[],int kosci[])
   wyswietlanieMozliwosci(tablicawynikow);
   wybor_dodania_punktow(kosci,tablicawynikow);
   sleep(2);
-  system("clear");
+  printf("\e[1;1H\e[2J");
   wyswietltablicewynikow(tablicawynikow);
   sleep(1);
-  system("clear");
+  printf("\e[1;1H\e[2J");
 
 
 
@@ -476,7 +476,7 @@ int gra1(){
   srand(time(NULL));
   wyswietlanie_tytul();
   sleep(2);
-  system("clear");
+  printf("\e[1;1H\e[2J");
 
   do {
     puts("tura gracza nr 1");
@@ -520,12 +520,12 @@ int gra2(){
 
 int main(){
 
-  system("clear");
+  printf("\e[1;1H\e[2J");
   puts("ktora gre chcesz zagrac? 1(poker),2(p//np)");
   int gamechoice=0;
   scanf("%d",&gamechoice);
   if(gamechoice==1){
-    system("clear");
+
     gra1();
   }
   else{
