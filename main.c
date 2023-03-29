@@ -458,10 +458,82 @@ void gra1()
   else puts("remis");
 }
 
+int gra2(){
+    short int kosc=0;
+    short int kosc2=0;
+    short int guess=0;
+    int cash=100;
+    int wybor = 1;
+
+
+    while(cash > 0 || wybor == 1)
+    {
+        int bet;
+        printf("twoje pieniadze %d $\n",cash);
+        printf("ile pienidzy chcesz betowac : ");
+        scanf("%d", &bet);
+        kosc=rzutkoscia();
+        kosc2=rzutkoscia();
+        puts("czy suma kosci jest : (0)parzysta czy (1)nieparzysta?" );
+        scanf("%d",&guess);
+        if ((kosc+kosc2) % 2 == 0 && guess == 0)
+        {
+            wyswietlanie_kosci(kosc);
+            wyswietlanie_kosci(kosc2);
+            printf("suma byly parzysta");
+            cash = cash + bet;
+        }
+        else if((kosc+kosc2) % 2 == 1 && guess == 1)
+        {
+            wyswietlanie_kosci(kosc);
+            wyswietlanie_kosci(kosc2);
+            printf("suma byly nieparzysta");
+            cash = cash + bet;
+        }
+        else if((kosc+kosc2) % 2 == 0 && guess == 1)
+        {
+            wyswietlanie_kosci(kosc);
+            wyswietlanie_kosci(kosc2);
+            printf("suma byly parzysta");
+            cash = cash - bet;
+        }
+        else if((kosc+kosc2) % 2 == 1 && guess == 0)
+        {
+            wyswietlanie_kosci(kosc);
+            wyswietlanie_kosci(kosc2);
+            printf("kosci byly nieparzysta");
+            cash = cash - bet;
+        }
+
+        int tak_nie;
+        printf("\nczy chesz zagrac dalej?(0(tak)/1(nie) : ");
+        scanf("%d",&tak_nie);
+        if(tak_nie == 1)
+        {
+            printf("\ntwoje pieniadze %d $\n",cash);
+            break;
+        }
+    }
+
+}
+
 
 int main()
 {
   srand(time(NULL));
-  gra1();
+  printf("Ktora gre wybierasz 1(gra w kosci), 2(p//pn): ");
+  int gamechoice = 0;
+  scanf("%d",&gamechoice);
+  if(gamechoice == 1)
+  {
+      gra1();
+  }
+  else if(gamechoice ==2)
+  {
+      gra2();
+  }
+  else{
+    printf("nie podana wlasciwego numeru");
+  }
 
 }
