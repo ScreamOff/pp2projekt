@@ -1,15 +1,47 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 
-int wyswietltablicewynikow(int tablica[]){
-  int sumatablicy =0;
-  for(int i = 0;i<14;i++){
-    sumatablicy=sumatablicy+tablica[i];
-    printf("%d\n", tablica[i]);
+const int N5=5;
+const int N14=14;
+
+typedef struct tablica
+{
+    int *T;
+    int dlugosc;
+}Tablica;
+
+typedef struct gracz
+{
+
+   int punkty;
+   Tablica wyniki;
+   Tablica kosci;
+}Gracz;
+
+Gracz inicjuj()
+{
+    int i;
+    Gracz G;
+    G.punkty=0;
+    G.wyniki.dlugosc=N14;
+    G.wyniki.T=(int *)malloc(N14*sizeof(int));
+    for(i=0;i<N14;i++) G.wyniki.T[i]=-1;
+    G.kosci.dlugosc=N5;
+    G.kosci.T=(int *)malloc(N5*sizeof(int));
+    for(i=0;i<N5;i++) G.kosci.T[i]=0;
+    return G;
+}
+
+int wyswietltablicewynikow(Tablica tab)
+{
+  int i, sumatablicy =0;
+  for(i=0;i<tab.dlugosc;i++){
+    sumatablicy=sumatablicy+tab.T[i];
+    printf("%d, ", tab.T[i]);
   }
+  printf("\n");
   return sumatablicy;
 }
 void wyswietlanie_kosci(int liczba){
@@ -30,505 +62,406 @@ void wyswietlanie_kosci(int liczba){
         default:;
     }
 }
-void selectionsort(int tablica[]){
-    int min,i,j,temp;
-    for (i=0;i<5-1;i++)
+
+void wyswietlenie_kosci1(Tablica tab)
+{
+	int i;
+	printf("Twoje kosci: ");
+	for(i=0;i<tab.dlugosc;i++) printf("%d, ",tab.T[i]);
+	printf("\n");
+}
+
+int para(Tablica kosci)
+{
+    int i, j, para=0, wynik=0;
+    int *p; //p[i] przechowuje ile jest oczek o numerze i, czyli na przyklad p[5] przechowuje ile jest piatek
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<kosci.dlugosc;i++) p[kosci.T[i]]++;
+    for(i=1;i<7;i++) if(p[i]==2) para++;
+    if(para==1)
     {
-    min=i;
-    for (j=i+1;j<5;j++)
-    if (tablica[j]<tablica[min]) min=j;
-    temp=tablica[min];
-    tablica[min]=tablica[i];
-    tablica[i]=temp;
-  }}
-void wyswietlanie_tytul(){
-    int a;
-    printf("                                       ________________________________________________\n");
-    printf("                                     |   __  ___   ______        _______.  ______  __  |\n");
-    printf("                                     |  |  |/  /  /  __  \\      /       | /      ||  | |\n");
-    printf("                                     |  |  '  /  |  |  |  |    |   (----`|  ,----'|  | |\n");
-    printf("                                     |  |    <   |  |  |  |     \\   \     |  |     |  | |\n");
-    printf("                                     |  |  .  \\  |  `--'  | .----)   |   |  `----.|  | |\n");
-    printf("                                     |  |__|\__\\   \\______/  |_______/     \\______||__| |\n");
-    printf("                                       ________________________________________________\n");
-    puts("wprowadz jeden zeby zaczac\n");
-    scanf("%d", &a);
-    system ("tput clear");
+      for(i=1;i<7;i++) if(p[i]==2) wynik=wynik+2*i;
+    }
+    free(p);
+    return wynik;
+}
+
+int dwiePary(Tablica kosci)
+{
+    int i, j, pary=0, wynik=0;
+    int *p;
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<kosci.dlugosc;i++) p[kosci.T[i]]++;
+    for(i=1;i<7;i++) if(p[i]==2) pary++;
+    if(pary==2)
+    {
+      for(i=1;i<7;i++) if(p[i]==2) wynik=wynik+2*i;
+    }
+    free(p);
+    return wynik;
+
+}
 
 
-}
-int para(int *karty) {
-    int i, j, para;
-    for (i = 0; i < 5; i++) {
-        para = 0;
-        for (j = i + 1; j < 5; j++) {
-            if (karty[j] == karty[i]) {
-                para++;
-            }
-        }
-        if (para == 1) {
-            return 1;
-        }
+int trojka(Tablica kosci)
+{
+int i, j, tr=0, pa=0, wynik=0;
+    int *p;
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<kosci.dlugosc;i++) p[kosci.T[i]]++;
+    for(i=1;i<7;i++)
+    {
+      if(p[i]==3) tr=1; //zliczam tam gdzie jest trojka
+      if(p[i]==2) pa++; //ale moze tez byc para gdzies indziej
     }
-    return 0;
-}
-int dwiePary(int *karty) {
-    int i, j, para1, para2;
-    para1 = para2 = 0;
-    int suma = 0; // dodane
-    for (i = 0; i < 5; i++) {
-        for (j = i + 1; j < 5; j++) {
-            if (karty[j] == karty[i]) {
-                if (para1 == 0) {
-                    para1 = karty[j];
-                } else if (karty[j] != para1 && para2 == 0) {
-                    para2 = karty[j];
-                }
-            }
-        }
+
+    if(tr==1 && pa!=1) //czyli jest trojka, ale w innych nie ma pary, czyli nie ma fulla
+    {
+      for(i=1;i<7;i++) if(p[i]==3) wynik=3*i;
     }
-    if (para1 != 0 && para2 != 0) {
-        suma = para1 * 2 + para2 * 2; // oblicz sum� oczek obu par
-        return suma;
-    } else {
-        return 0;
-    }
+    free(p);
+    return wynik;
 }
-int punkty_para(int *karty) {
-    int i, j, para;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        para = 0;
-        for (j = i + 1; j < 5; j++) {
-            if (karty[j] == karty[i]) {
-                para++;
-                suma_pkt = karty[j] + karty[i];
-            }
-        }
-        if (para == 1) {
-            return suma_pkt;
-        }
+
+int malystrit(Tablica kosci) {
+    int i, wynik=1; //zakladam ze jest strit
+    int *p;
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<kosci.dlugosc;i++) p[kosci.T[i]]++;
+    for (i=1;i<=5;i++) {
+        if (p[i]!=1) wynik=0; //jezeli gdzies jest wiecej niz 1, to nie ma strita i daje wynik na 0
     }
-    return 0;
+    if(wynik) wynik=15; //jezeli jest maly strit
+    free(p);
+    return wynik;
 }
-int punkty_trojka(int *karty) {
-    int i, j, para;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        para = 0;
-        for (j = i + 1; j < 5; j++) {
-            if (karty[j] == karty[i]) {
-                para++;
-                suma_pkt = karty[i];
-            }
-        }
-        if (para == 2) {
-            return 3*suma_pkt;
-        }
+
+int duzystrit(Tablica kosci) {
+    int i, wynik=1;
+    int *p;
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<kosci.dlugosc;i++) p[kosci.T[i]]++;
+    for (i=2;i<=6;i++) {
+        if (p[i]!=1) wynik=0;
     }
-    return 0;
+    if(wynik) wynik=20; //jezeli jest duzy strit
+    free(p);
+    return wynik;
 }
-int trojka(int *karty) {
-    int i, j, para;
-    for (i = 0; i < 5; i++) {
-        para = 0;
-        for (j = i + 1; j < 5; j++) {
-            if (karty[j] == karty[i]) {
-                para++;
-            }
-        }
-        if (para == 2) {
-            return 1;
-        }
+
+int full(Tablica kosci)
+{
+int i, j, tr=0, pa=0, wynik=0;
+    int *p;
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<kosci.dlugosc;i++) p[kosci.T[i]]++;
+    for(i=1;i<7;i++)
+    {
+      if(p[i]==3) tr=1; //zliczam tam gdzie jest trojka
+      else
+      if(p[i]==2) pa++; //ale moze tez byc para gdzies indziej
     }
-    return 0;
+
+    if(tr==1 && pa==1) //czyli jest trojka i para czyli full
+    {
+      wynik=25;
+    }
+    free(p);
+    return wynik;
 }
-int strit(int *karty) {
+
+int general(Tablica kosci)
+{
+    int i, j, gen=0, wynik=0;
+    int *p;
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<5;i++) p[kosci.T[i]]++;
+    for(i=1;i<7 && p[i]!=5;i++) if(p[i]==5) gen=i;
+    free(p);
+    if(gen) return 30;
+
+}
+int kareta(Tablica kosci)
+{
+    int i, j, kar=0, wynik=0;
+    int *p;
+    p=(int*)malloc(7*sizeof(int));
+    for(i=0;i<7;i++) p[i]=0;
+    for(i=0;i<5;i++) p[kosci.T[i]]++;
+    for(i=1;i<7 && p[i]!=4;i++) if(p[i]==4) kar=i; //zapamietuje jaki numer tworzy karete
+    free(p);
+    if(kar) return 4*kar;
+}
+
+int jedynki(Tablica kosci) {
     int i;
-    for (i = 0; i < 4; i++) {
-        if (karty[i + 1] != karty[i] + 1) {
-            return 0;
-        }
+    int suma = 0;
+    for (i = 0; i < kosci.dlugosc; i++) {
+        if (kosci.T[i] == 1)
+            suma++;
     }
-    return 1;
+    return suma;
 }
-int general(int *kosci) {
-    int i, j;
-    for (i = 0; i < 5; i++) {
-        int licznik = 0;
-        for (j = 0; j < 5; j++) {
-            if (kosci[j] == kosci[i]) {
-                licznik++;
-            }
-        }
-        if (licznik == 5) {
-            return 1;
-        }
-    }
-    return 0;
-}
-int kareta(int *kosci) {
-    int i, j;
-    for (i = 0; i < 5; i++) {
-        int licznik = 0;
-        for (j = 0; j < 5; j++) {
-            if (kosci[j] == kosci[i]) {
-                licznik++;
-            }
-        }
-        if (licznik == 4) {
-            return 1;
-        }
-    }
-    return 0;
-
-}
-int punkty_jednyka(int *kosci) {
+int dwojki(Tablica kosci) {
     int i;
-    int repeat = 0;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        if (kosci[i] == 1)
-            repeat++;
+    int suma = 0;
+    for (i = 0; i < kosci.dlugosc; i++) {
+        if (kosci.T[i] == 2)
+            suma++;
     }
-
-    return repeat*1;
+    return 2*suma;
 }
-int punkty_dwojka(int *kosci) {
+int trojki(Tablica kosci) {
     int i;
-    int repeat = 0;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        if (kosci[i] == 2)
-            repeat++;
+    int suma = 0;
+    for (i = 0; i < kosci.dlugosc; i++) {
+        if (kosci.T[i] == 3)
+            suma++;
     }
 
-    return repeat*2;
+    return 3*suma;
 }
-int punkty_trojki(int *kosci) {
+int czworki(Tablica kosci) {
     int i;
-    int repeat = 0;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        if (kosci[i] == 3)
-            repeat++;
+    int suma = 0;
+    for (i = 0; i < kosci.dlugosc; i++) {
+        if (kosci.T[i] == 4)
+            suma++;
     }
 
-    return repeat*3;
+    return 4*suma;
 }
-int punkty_cztery(int *kosci) {
+int piatki(Tablica kosci) {
     int i;
-    int repeat = 0;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        if (kosci[i] == 4)
-            repeat++;
+    int suma = 0;
+    for (i = 0; i < kosci.dlugosc; i++) {
+        if (kosci.T[i] == 5)
+            suma++;
     }
-
-    return repeat*4;
+    return 5*suma;
 }
-int punkty_piec(int *kosci) {
+
+int szostki(Tablica kosci) {
     int i;
-    int repeat = 0;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        if (kosci[i] == 5)
-            repeat++;
+    int suma = 0;
+    for (i = 0; i < kosci.dlugosc; i++) {
+        if (kosci.T[i] == 6)
+            suma++;
     }
-
-    return repeat*5;
-}
-int punkty_szesc(int *kosci) {
-    int i;
-    int repeat = 0;
-    int suma_pkt = 0;
-    for (i = 0; i < 5; i++) {
-        if (kosci[i] == 6)
-            repeat++;
-    }
-
-    return repeat*6;
+    return 6*suma;
 }
 
 
-int wybor_dodania_punktow(int *kosci,int tablicawynikow[]){
+Gracz wybor_dodania_punktow(Gracz G){
     int n;
     int m;
     int punkty;
-    printf("Do czego chcesz dodac punkty 0(para),1(dwie pary), 2(trojka), 3(kareta), 4(maly strit) , 5(duzy strit), 6(kareta) ,\n 7(general) , 8(jednyki), 9(dwujki) , 10(trojki), 11(czworki) , 12(piatki), 13(szostki) : ");
+    printf("Do czego chcesz dodac punkty 0(para),1(dwie pary), 2(trojka), 3(kareta), 4(maly strit) , 5(duzy strit), 6(full) ,\n 7(general) , 8(jedynki), 9(dwojki) , 10(trojki), 11(czworki) , 12(piatki), 13(szostki) : ");
 
+    do{
     scanf("%d", &n);
     switch(n)
     {
         case 0:
-            if(para(kosci))
-            {
-                punkty = punkty_para(kosci);
-                tablicawynikow[n]=punkty;
-                break;
-            }
-            else
-            {
-                break;
-            }
+            punkty = para(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
         case 1:
-            {
-                punkty = dwiePary(kosci);
-                tablicawynikow[n]=punkty;
-                break;
-            }
-
+            punkty = dwiePary(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
         case 2:
-            if(trojka(kosci))
-            {
-                punkty = punkty_trojka(kosci);
-                tablicawynikow[n]=punkty;
-                break;
-            }
-            else
-            {
-                break;
-            }
+            punkty = trojka(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
         case 3:
-            if(kareta(kosci))
-            {
-                punkty = kosci[0]+kosci[1]+kosci[2]+kosci[3];
-                tablicawynikow[n]=punkty;
-                break;
-            }
-            else
-            {
-                break;
-            }
+            punkty = kareta(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
         case 4:
-            if(strit(kosci)&& kosci[0] == 1)
-            {
-                punkty = 15;
-                tablicawynikow[n]=punkty;
-                break;
-            }
-            else
-            {
-                break;
-            }
+            punkty = malystrit(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
         case 5:
-            if(strit(kosci)&& kosci[0] == 2)
-            {
-                punkty = 20;
-                tablicawynikow[n]=punkty;
-                break;
-            }
-            else
-            {
-                break;
-            }
+            punkty = duzystrit(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
         case 6:
-            if(general(kosci))
-            {
-                punkty = 30;
-                tablicawynikow[n]=punkty;
-            }
-            else
-            {
-                break;
-            }
-        case 7:{
-            if(para(kosci)&&trojka(kosci))
-            {
-                punkty = punkty_trojka(kosci)+ punkty_para(kosci) + 10;
-                tablicawynikow[n]=punkty;
-                break;
-            }
-            else
-            {
-                break;
-            }
-        }
-        case 8:{
-            punkty = punkty_jednyka(kosci);
-            tablicawynikow[n]=punkty;
+            punkty=full(G.kosci);
+            G.wyniki.T[n]=punkty;
             break;
-        }
-        case 9:{
-            punkty = punkty_dwojka(kosci);
-            tablicawynikow[n]=punkty;
+        case 7:
+            punkty = general(G.kosci);
+            G.wyniki.T[n]=punkty;
             break;
-        }
-        case 10:{
-            punkty = punkty_trojki(kosci);
-            tablicawynikow[n]=punkty;
+        case 8:
+            punkty = jedynki(G.kosci);
+            G.wyniki.T[n]=punkty;
             break;
-        }
-        case 11:{
-            punkty = punkty_cztery(kosci);
-            tablicawynikow[n]=punkty;
+        case 9:
+            punkty = dwojki(G.kosci);
+            G.wyniki.T[n]=punkty;
             break;
-        }
-        case 12:{
-            punkty = punkty_piec(kosci);
-            tablicawynikow[n]=punkty;
+        case 10:
+            punkty = trojki(G.kosci);
+            G.wyniki.T[n]=punkty;
             break;
-        }
-        case 13:{
-            punkty = punkty_szesc(kosci);
-            tablicawynikow[n]=punkty;
+        case 11:
+            punkty = czworki(G.kosci);
+            G.wyniki.T[n]=punkty;
             break;
-        }
+        case 12:
+            punkty = piatki(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
+        case 13:
+            punkty=szostki(G.kosci);
+            G.wyniki.T[n]=punkty;
+            break;
         default:
-            printf("Nie podales zadnej z liczb\n");
-    }
+            printf("Nie podales zadnej z liczb\n podaj jeszcze raz: \n");
+    }}while(n>13);
+    return G;
+}
 
-
-    return punkty;}
-int rzutkoscia(){
-
+int rzutkoscia()
+{
       int kosc;
       kosc= (rand ()%6 )+ 1;
-      //wyswietlanie_kosci(kosc);
       return kosc;
-    }
-void wyswietlanieMozliwosci(int tablicawynikowGracza[]){
+}
+
+void wyswietlanieMozliwosci(Tablica tab)
+{
+	int i;
   printf("Zostaly opcje nr\n");
-  for(int i = 0;i<14;i++){
-    if(tablicawynikowGracza[i]== -1){
-      printf("%d\n", i);
-    }
+  for(i = 0;i<tab.dlugosc;i++){
+    if(tab.T[i]== -1) printf("%d, ", i);
   }
+  printf("\n");
 }
-int sprawdzanietablicywynikow(int pozycja ,int tablicawynikowGracza[],int punkty){
-    if(tablicawynikowGracza[pozycja]== -1)
+Gracz sprawdzanietablicywynikow(Gracz G, int pozycja ,int punkty){
+    if(G.wyniki.T[pozycja]== -1) G.wyniki.T[pozycja]= punkty;
+    else puts("Za oszukiwanie sie przegrywa ??");
+    return G;
+}
+
+Tablica indeksydozmiany() //funkcja zwracajaca tablice indeksow do zmiany
+{
+	int i, ile, ind;
+	Tablica R;
+    printf("(pierwsza kosc to 0) Ile kosci chcesz wybrac do zwrotu: ");
+    scanf("%d", &ile);
+    if(ile>=0 && ile<=5) //jezeli liczba indeksow do zmiany jest w sensownym zakresie czyli 0...5
     {
-      tablicawynikowGracza[pozycja]= punkty;
-
-      return 1;
-    }
-    else{
-      puts("Za oszukiwanie sie przegrywa :)");
-      sleep(5);
-
-      return 0;
-    }
+	   R.dlugosc=ile;
+       if(ile>0)R.T=(int*)malloc(ile*sizeof(int));
+       for(i=0;i<ile;i++)
+       {
+	      printf("Podaj nr %d indeksu do zmiany: ", i+1);
+          scanf("%d", &ind);
+          if(ind>=0 && ind<5) R.T[i]=ind; else //jezeli numer indeksu do zmiany jest w zakresie 0...4
+          {
+	         R.T[i]=-1; //jezeli nie to wstawiam -1, wtedy przy zmianie to pomine
+             printf("Niewlasciwy numer indeksu do zmiany, brak zmiany\n");
+          }
+       }
+    } else printf("Niewlasciwa liczba kosci do zwrotu\n");
+    return R;
 }
-void ponownelosowanie(int tablica[]){
-  int ilekosci, j;
-  printf("ile kosci chcesz wybrac do zwrotu:\n");
-  scanf("%d",&ilekosci);
-  for(int i=0;i<ilekosci;i++){
-    printf("podaj numer indexu %d. kosci:\n ",i);
-    scanf("%d", &j);
-    tablica[j]= rzutkoscia();
-    sleep(2);
-    printf("ZOSTALA WYLOSOWANA: %d\n",tablica[j]);
-    }
 
+Gracz ponownelosowanie(Gracz G)
+{
+  Tablica Z;
+  int i;
+  Z=indeksydozmiany(); //wczytanie indeksow do zmiany funkcja poprzednia
+  for(i=0;i<Z.dlugosc;i++){ //przegladam tablice zmian
+	if(G.kosci.T[Z.T[i]]>=0) //jezeli indeks ma liczbe 0...4, czyli nie ma tam -1
+    G.kosci.T[Z.T[i]]= rzutkoscia(); //to w tablicy kosci podmieniam ponownym losowaniem
+    //sleep(2);
+    }
+    if(Z.dlugosc>0) free(Z.T); //jezeli tablica ma dlugosc przynajmniej 1 czyli gracz cos wybral do zmiany, to zwalniam ja
+    return G;
 }
-void wyswietltablice(int tablica[]){
-  for(int i = 0;i<5;i++){
-    printf("%d\n", tablica[i]);
+
+void wyswietltablice(Tablica tab){
+  int i;
+  for(i = 0;i<tab.dlugosc;i++){
+    printf("%d, ", tab.T[i]);
   }
+  printf("\n");
 }
-int sprawdzczypelna(int tablica[]){
-  for(int i=0;i<14;i++){
-    if(tablica[i]==-1){
-      return 0;
-    }
+
+int sprawdzczypelna(Tablica tab)
+{
+  int i;
+  for(i=0;i<tab.dlugosc;i++)
+  {
+    if(tab.T[i]==-1) return 0;
   }
-  return 1;}
-void turaGracza1(char gracz[],int punktygracza,int tablicawynikow[],int kosci[]){
-  printf("\e[1;1H\e[2J");
+  return 1;
+}
+
+
+Gracz turaGracza(Gracz G)
+{
   int i=0;
-  wyswietlanieMozliwosci(tablicawynikow);
-  sleep(2);
-  printf("\e[1;1H\e[2J");
+  wyswietlanieMozliwosci(G.wyniki);
+  //sleep(2);
   for(i=0;i<5;i++){
-    kosci[i]=rzutkoscia();
-    wyswietlanie_kosci(kosci[i]);
+    G.kosci.T[i]=rzutkoscia();
+    wyswietlanie_kosci(G.kosci.T[i]);
   }
-  selectionsort(kosci);
-  ponownelosowanie(kosci);
-  selectionsort(kosci);
-  printf("\e[1;1H\e[2J");
+  wyswietlenie_kosci1(G.kosci);
+  G=ponownelosowanie(G);
   for(i=0;i<5;i++){
-  wyswietlanie_kosci(kosci[i]);}
-  ponownelosowanie(kosci);
-  selectionsort(kosci);
+  wyswietlanie_kosci(G.kosci.T[i]);}
+  wyswietlenie_kosci1(G.kosci);
+  G=ponownelosowanie(G);
   for(i=0;i<5;i++){
-  wyswietlanie_kosci(kosci[i]);}
-  wyswietlanieMozliwosci(tablicawynikow);
-  wybor_dodania_punktow(kosci,tablicawynikow);
-  sleep(2);
-  printf("\e[1;1H\e[2J");
-  wyswietltablicewynikow(tablicawynikow);
-  sleep(1);
-  printf("\e[1;1H\e[2J");
-
-
-
+  wyswietlanie_kosci(G.kosci.T[i]);}
+  wyswietlenie_kosci1(G.kosci);
+  wyswietlanieMozliwosci(G.wyniki);
+  G=wybor_dodania_punktow(G);
+  //sleep(2);
+  wyswietltablicewynikow(G.wyniki);
+  //sleep(1);
+  return G;
 }
-int gra1(){
-  char gracz1[40];
-  char gracz2[40];
-  int punktygracza1=0;
-  int punktygracza2=0;
-  int tablicawynikow1[]={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-  int tablicawynikow2[]={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-  int kosci[5];
-  srand(time(NULL));
-  wyswietlanie_tytul();
-  sleep(2);
-  printf("\e[1;1H\e[2J");
+
+void gra1()
+{
+  Gracz G1, G2;
+  G1=inicjuj();
+  G2=inicjuj();
+  //sleep(2);
 
   do {
     puts("tura gracza nr 1");
-    sleep(1);
-    turaGracza1(gracz1,punktygracza1,tablicawynikow1,kosci);
+    //sleep(1);
+    G1=turaGracza(G1);
     puts("tura gracza nr 2");
-    sleep(1);
-    turaGracza1(gracz2,punktygracza2,tablicawynikow2,kosci);
-  } while(sprawdzczypelna(tablicawynikow1)==0);
-  punktygracza1=wyswietltablicewynikow(tablicawynikow1);
-  punktygracza2=wyswietltablicewynikow(tablicawynikow2);
-
-  if(punktygracza1>punktygracza2){
-    puts("gracz1 wygrywa");
-  }
-  else if(punktygracza1<punktygracza2){
-    puts("gracz2 wygrywa");
-  }
-  else{
-    puts("remis");
-  }
-
-
-  return 0;
-  }
-int gra2(){
-    int kosc=0;
-    int guess=0;
-    int punkty=0;
-    do {
-      /* code */
-
-    kosc=rzutkoscia();
-    puts("(1)nieparzyste? czy (2)parzyste");
-    scanf("%d",guess);
-    if(kosc%2==guess){
-      punkty=punkty+1;
-    }    } while(punkty<10);
+    //sleep(1);
+    G2=turaGracza(G2);
+  } while(sprawdzczypelna(G1.wyniki)==0);
+  G1.punkty=wyswietltablicewynikow(G1.wyniki);
+  G2.punkty=wyswietltablicewynikow(G2.wyniki);
+  if(G1.punkty>G2.punkty) puts("gracz1 wygrywa");
+  else if(G1.punkty<G2.punkty) puts("gracz2 wygrywa");
+  else puts("remis");
 }
 
 
-int main(){
+int main()
+{
+  srand(time(NULL));
+  gra1();
 
-  printf("\e[1;1H\e[2J");
-  puts("ktora gre chcesz zagrac? 1(poker),2(p//np)");
-  int gamechoice=0;
-  scanf("%d",&gamechoice);
-  if(gamechoice==1){
-
-    gra1();
-  }
-  else{
-    gra2();
-  }
 }
