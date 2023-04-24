@@ -267,6 +267,14 @@ Gracz wybor_dodania_punktow(Gracz G){
 
     do{
     scanf("%d", &n);
+    while(G.wyniki.T[n]!= -1)
+    {
+        puts("");
+        puts("podaj poprawny wybor(juz byl zajety)");
+        puts("");
+        printf("Do czego chcesz dodac punkty 0(para),1(dwie pary), 2(trojka), 3(kareta), 4(maly strit) , 5(duzy strit), 6(full) ,\n 7(general) , 8(jedynki), 9(dwojki) , 10(trojki), 11(czworki) , 12(piatki), 13(szostki) : ");
+        scanf("%d", &n);
+    }
     switch(n)
     {
         case 0:
